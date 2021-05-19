@@ -43,7 +43,8 @@ function addFlag() {
 }
 
 async function getCountries() {
-    const res = await fetch('/js/countries.json');
+    const url = document.URL;
+    const res = await fetch(`${url}js/countries.json`);
     const countries = res.ok ? (await res.json()) : [];
     return countries;
 }
