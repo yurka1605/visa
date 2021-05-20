@@ -29,10 +29,12 @@ $(document).ready(function() {
     $('.banner__form-btn button, .banner__form-btn--mobile').click(() => {
         const mounth = $('.banner-form-select--mounth .current').text().trim();
         const country = $('.banner-form-select--countries .current').text().trim();
+        const current = window.countries.find(el => el.name === country);
         $('.variants__filter-item--mounth .variants__filter-item_value').text(mounth);
-        $('.variants__filter-item--country_flag').html(window.countries.find(el => el.name === country).flag);
+        $('.variants__filter-item--country_flag').html(current?.flag);
         $('.variants__filter-item--country_name').html(country);
         $('.variants').addClass('show');
+        showVariants(current, mounth);
     });
 
     $('button[data-callme="true"]').click(() => {
@@ -78,4 +80,50 @@ async function getCountries() {
     const res = await fetch(`${url}/js/countries.json`);
     const countries = res.ok ? (await res.json()) : [];
     return countries;
+}
+
+function showVariants(current, mounth) {
+    $('.variants__list').addClass('loader');
+
+    if (current.sale_c) {
+        $('.variants__list_item--visa-c').addClass('variants__list_item--with-sale'); 
+    } else {
+        $('.variants__list_item--visa-c').removeClass('variants__list_item--with-sale');
+    }
+
+    if (current.sale_d) {
+        $('.variants__list_item--visa-d').addClass('variants__list_item--with-sale'); 
+    } else {
+        $('.variants__list_item--visa-d').removeClass('variants__list_item--with-sale'); 
+    }
+
+    $('.variants__list_item--visa-c img').attr({
+        'src': `./image/country/${current.key}1.jpg`,
+        'alt': current.name
+    });
+
+    $('.variants__list_item--visa-d img').attr({
+        'src': `./image/country/${current.key}2.jpg`,
+        'alt': current.name
+    });
+
+    $('.variants__list_item-name').text(`Виза в "${current.name}"`);
+    $('.variants__list_item-option--duration').text(current.duration);
+    $('.variants__list_item-visited-opt--multiple')
+        .removeClass('success')
+        .removeClass('error')
+        .addClass(current.multiple ? 'success': 'error');
+    $('.variants__list_item-visited-opt--today')
+        .removeClass('success')
+        .removeClass('error')
+        .addClass(current.visited_today ? 'success': 'error');
+
+    $('.banner__img').attr({
+        'src': `./image/country/${current.key}1.jpg`,
+        'alt': current.name
+    });
+
+    setTimeout(() => {
+        $('.variants__list').removeClass('loader');
+    }, 1000);
 }
